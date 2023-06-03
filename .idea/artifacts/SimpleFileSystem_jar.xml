@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="SimpleFileSystem:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/SimpleFileSystem_jar</output-path>
+    <root id="archive" name="SimpleFileSystem.jar">
+      <element id="module-output" name="SimpleFileSystem" />
+    </root>
+  </artifact>
+</component>
