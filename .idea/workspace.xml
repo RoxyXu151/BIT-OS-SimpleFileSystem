@@ -10,17 +10,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="265c658a-b53f-4316-9805-3cf793bb128e" name="更改" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Directory.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/DirectoryEntry.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/DirectoryFile.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/DiskConst.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/SimpleFileSystem.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/VirtualBlock.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/VirtualDisk.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/VirtualFile.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/使用说明书.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/操作系统实验4实验报告.md" beforeDir="false" afterPath="$PROJECT_DIR$/操作系统实验4实验报告.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -131,7 +121,7 @@
       <workItem from="1685709650591" duration="1365000" />
       <workItem from="1750850693436" duration="434000" />
       <workItem from="1750851151073" duration="278000" />
-      <workItem from="1750851440593" duration="1577000" />
+      <workItem from="1750851440593" duration="2055000" />
     </task>
     <servers />
   </component>
