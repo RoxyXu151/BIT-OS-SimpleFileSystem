@@ -1,8 +1,8 @@
 /**
- * 存储系统常量配置类
+ * 虚拟存储系统常量配置类
  * 定义了存储系统的基本参数和配置信息
  */
-public class DiskConst {
+public class StorageConstants {
     /**
      * 存储系统常量定义
      * 

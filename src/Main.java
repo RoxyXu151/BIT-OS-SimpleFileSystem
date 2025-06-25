@@ -3,7 +3,7 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        SimpleFileSystem fs = null;
+        ChiikaFileSystemCore fs = null;
         System.out.println("欢迎使用简易文件系统！");
         System.out.println("请选择操作：");
         System.out.println("new: 创建新的文件系统");
@@ -13,11 +13,11 @@ public class Main {
         String choice = scanner.next();
         switch (choice) {
             case "new":
-                fs = new SimpleFileSystem();
+                fs = new ChiikaFileSystemCore();
                 System.out.println("已创建新的文件系统");
                 break;
             case "sfs":
-                fs = new SimpleFileSystem();
+                fs = new ChiikaFileSystemCore();
                 System.out.println("已打开现有文件系统");
                 break;
             case "exit":

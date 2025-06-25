@@ -3,12 +3,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 目录类
+ * 文件系统目录类
  * 表示文件系统中的目录结构，管理子目录和文件
  */
-public class Directory extends DirectoryEntry implements Serializable {
+public class FileSystemFolder extends FileSystemNode implements Serializable {
     // 目录内容表，存储子目录和文件的映射关系
-    private final HashMap<String, DirectoryEntry> dirTable;
+    private final HashMap<String, FileSystemNode> dirTable;
 
     /**
      * 创建一个新的目录
@@ -17,7 +17,7 @@ public class Directory extends DirectoryEntry implements Serializable {
      * @param isDirectory 是否为目录（应始终为true）
      * @param parentDir 父目录引用
      */
-    public Directory(String name, boolean isDirectory, Directory parentDir) {
+    public FileSystemFolder(String name, boolean isDirectory, FileSystemFolder parentDir) {
         super(name, isDirectory, parentDir);
         dirTable = new HashMap<>();
     }
@@ -38,7 +38,7 @@ public class Directory extends DirectoryEntry implements Serializable {
      * @param name 条目名称
      * @return 条目对象，如果不存在则返回null
      */
-    public DirectoryEntry getEntry(String name) {
+    public FileSystemNode getEntry(String name) {
         return dirTable.get(name);
     }
     
@@ -48,17 +48,17 @@ public class Directory extends DirectoryEntry implements Serializable {
      * @param name 条目名称
      * @param entry 条目对象
      */
-    public void addEntry(String name, DirectoryEntry entry) {
+    public void addEntry(String name, FileSystemNode entry) {
         dirTable.put(name, entry);
     }
     
     /**
-     * 从目录中移除条目
+     * 移除目录中的条目
      * 
      * @param name 条目名称
-     * @return 被移除的条目，如果不存在则返回null
+     * @return 被移除的条目对象，如果不存在则返回null
      */
-    public DirectoryEntry removeEntry(String name) {
+    public FileSystemNode removeEntry(String name) {
         return dirTable.remove(name);
     }
     
@@ -72,11 +72,11 @@ public class Directory extends DirectoryEntry implements Serializable {
     }
     
     /**
-     * 获取目录中所有条目
+     * 获取目录中的所有条目
      * 
-     * @return 条目映射表
+     * @return 条目映射表的副本
      */
-    public Map<String, DirectoryEntry> getEntries() {
+    public Map<String, FileSystemNode> getEntries() {
         return new HashMap<>(dirTable);
     }
     
@@ -91,9 +91,9 @@ public class Directory extends DirectoryEntry implements Serializable {
     
     @Override
     public String toString() {
-        return "Directory{" +
+        return "FileSystemFolder{" +
+                "name='" + name + '\'' +
                 "dirTable=" + dirTable +
-                ", name='" + name + '\'' +
                 ", isDirectory=" + isDirectory +
                 ", parentDir=" + parentDir +
                 '}';

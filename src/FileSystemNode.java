@@ -1,41 +1,41 @@
 import java.io.Serializable;
 
 /**
- * 文件系统条目基类
+ * 文件系统节点基类
  * 作为文件和目录的共同父类，定义了基本属性
  */
-public abstract class DirectoryEntry implements Serializable {
+public abstract class FileSystemNode implements Serializable {
     // 条目名称（文件名或目录名）
     protected String name;                     
     // 类型标志（true=目录，false=文件）
     protected boolean isDirectory;             
     // 父目录引用
-    protected Directory parentDir;             
+    protected FileSystemFolder parentDir;             
 
     /**
-     * 创建一个新的文件系统条目
+     * 创建一个新的文件系统节点
      * 
-     * @param name 条目名称
+     * @param name 节点名称
      * @param isDirectory 是否为目录
      * @param parentDir 父目录引用
      */
-    public DirectoryEntry(String name, boolean isDirectory, Directory parentDir) {
+    public FileSystemNode(String name, boolean isDirectory, FileSystemFolder parentDir) {
         this.name = name;
         this.isDirectory = isDirectory;
         this.parentDir = parentDir;
     }
 
     /**
-     * 获取条目名称
-     * @return 条目名称
+     * 获取节点名称
+     * @return 节点名称
      */
     public String getName() {
         return name;
     }
     
     /**
-     * 设置条目名称
-     * @param name 新的条目名称
+     * 设置节点名称
+     * @param name 新的节点名称
      */
     public void setName(String name) {
         this.name = name;
@@ -53,7 +53,7 @@ public abstract class DirectoryEntry implements Serializable {
      * 获取父目录
      * @return 父目录引用
      */
-    public Directory getParentDir() {
+    public FileSystemFolder getParentDir() {
         return parentDir;
     }
     
@@ -61,13 +61,13 @@ public abstract class DirectoryEntry implements Serializable {
      * 设置父目录
      * @param parentDir 新的父目录引用
      */
-    public void setParentDir(Directory parentDir) {
+    public void setParentDir(FileSystemFolder parentDir) {
         this.parentDir = parentDir;
     }
     
     @Override
     public String toString() {
-        return "DirectoryEntry{" +
+        return "FileSystemNode{" +
                 "name='" + name + '\'' +
                 ", isDirectory=" + isDirectory +
                 ", parentDir=" + parentDir +

@@ -3,14 +3,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
- * 存储设备类
+ * 虚拟存储设备类
  * 模拟物理存储设备，管理存储块的分配和释放
  */
-public class VirtualDisk implements Serializable {
+public class StorageDevice implements Serializable {
     // 存储设备标识符
     public String deviceId;                 
     // 存储块数组
-    public VirtualBlock[] storageBlocks;    
+    public StorageBlock[] storageBlocks;    
     // 存储块分配状态表 (0=空闲, 1=已分配)
     public int[] allocationMap;             
     // 存储设备空间状态
@@ -20,17 +20,29 @@ public class VirtualDisk implements Serializable {
      * 创建新的存储设备实例
      * @param deviceId 存储设备标识符
      */
-    public VirtualDisk(String deviceId) {
+    public StorageDevice(String deviceId) {
         this.deviceId = deviceId;
-        this.storageBlocks = new VirtualBlock[DiskConst.DISK_SIZE];
-        this.allocationMap = new int[DiskConst.DISK_SIZE];
+        this.storageBlocks = new StorageBlock[StorageConstants.DISK_SIZE];
+        this.allocationMap = new int[StorageConstants.DISK_SIZE];
         this.storageExhausted = false;
         
         // 初始化所有存储块
-        for (int i = 0; i < DiskConst.DISK_SIZE; i++) {
-            this.storageBlocks[i] = new VirtualBlock(i);
+        for (int i = 0; i < StorageConstants.DISK_SIZE; i++) {
+            this.storageBlocks[i] = new StorageBlock(i);
             this.allocationMap[i] = 0;
         }
+    }
+
+    /**
+     * 获取已使用的存储块数量
+     * @return 已使用的存储块数量
+     */
+    private int getUsedBlockCount() {
+        int usedCount = 0;
+        for (int allocation : allocationMap) {
+            usedCount += allocation;
+        }
+        return usedCount;
     }
 
     /**
@@ -40,13 +52,13 @@ public class VirtualDisk implements Serializable {
      */
     public ArrayList<Integer> diskAlloc(int blockCount) {
         ArrayList<Integer> allocatedBlocks = new ArrayList<>();
-        for (int i = 0; i < blockCount; i++) {
-            for (int j = 0; j < DiskConst.DISK_SIZE; j++) {
-                if (allocationMap[j] == 0) {
-                    allocatedBlocks.add(j);
-                    allocationMap[j] = 1;
-                    break;
-                }
+        int allocated = 0;
+        
+        for (int j = 0; j < StorageConstants.DISK_SIZE && allocated < blockCount; j++) {
+            if (allocationMap[j] == 0) {
+                allocatedBlocks.add(j);
+                allocationMap[j] = 1;
+                allocated++;
             }
         }
         return allocatedBlocks;
@@ -70,14 +82,11 @@ public class VirtualDisk implements Serializable {
         if (isFull()) {
             System.out.println("存储设备已完全占满。");
         } else {
-            int usedCount = 0;
-            for (int i = 0; i < DiskConst.DISK_SIZE; i++) {
-                usedCount += allocationMap[i];
-            }
-            int usagePercentage = (int) (100.0 * usedCount / DiskConst.DISK_SIZE);
+            int usedCount = getUsedBlockCount();
+            int usagePercentage = (int) (100.0 * usedCount / StorageConstants.DISK_SIZE);
             System.out.println("存储使用率: " + usagePercentage + "%");
             System.out.println("已分配块数: " + usedCount);
-            System.out.println("可用块数: " + (DiskConst.DISK_SIZE - usedCount));
+            System.out.println("可用块数: " + (StorageConstants.DISK_SIZE - usedCount));
         }
     }
 
@@ -86,19 +95,13 @@ public class VirtualDisk implements Serializable {
      * @return 如果存储设备已满则返回true，否则返回false
      */
     public boolean isFull() {
-        storageExhausted = true;
-        for (int i = 0; i < DiskConst.DISK_SIZE; i++) {
-            if (!storageBlocks[i].isUsed()) {
-                storageExhausted = false;
-                break;
-            }
-        }
+        storageExhausted = (getUsedBlockCount() == StorageConstants.DISK_SIZE);
         return storageExhausted;
     }
 
     @Override
     public String toString() {
-        return "VirtualDisk{" +
+        return "StorageDevice{" +
                 "deviceId='" + deviceId + '\'' +
                 ", storageBlocks=" + Arrays.toString(storageBlocks) +
                 ", allocationMap=" + Arrays.toString(allocationMap) +

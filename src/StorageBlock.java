@@ -1,12 +1,12 @@
 import java.io.Serializable;
 
 /**
- * 存储块类
+ * 虚拟存储块类
  * 表示存储系统中的基本存储单元，使用字符串存储内容以简化实现
  */
-public class VirtualBlock implements Serializable {
+public class StorageBlock implements Serializable {
     // 存储块的最大容量（字符数）
-    private static final int MAX_CAPACITY = DiskConst.BLOCK_SIZE;    
+    private static final int MAX_CAPACITY = StorageConstants.BLOCK_SIZE;    
     // 存储块的唯一标识符
     private final int blockIndex;                                   
     // 存储块的剩余可用空间
@@ -20,7 +20,7 @@ public class VirtualBlock implements Serializable {
      * 构造一个新的存储块
      * @param blockIndex 存储块的唯一标识符
      */
-    public VirtualBlock(int blockIndex) {
+    public StorageBlock(int blockIndex) {
         this.blockIndex = blockIndex;
         this.availableSpace = MAX_CAPACITY ;
         this.allocated = false;
@@ -88,7 +88,7 @@ public class VirtualBlock implements Serializable {
 
     @Override
     public String toString() {
-        return "VirtualBlock{" +
+        return "StorageBlock{" +
                 "blockIndex=" + blockIndex +
                 ", availableSpace=" + availableSpace +
                 ", allocated=" + allocated +
