@@ -68,16 +68,16 @@ public class VirtualDisk implements Serializable {
      */
     public void diskUsage() {
         if (isFull()) {
-            System.out.println("Storage device is completely full.");
+            System.out.println("存储设备已完全占满。");
         } else {
             int usedCount = 0;
             for (int i = 0; i < DiskConst.DISK_SIZE; i++) {
                 usedCount += allocationMap[i];
             }
             int usagePercentage = (int) (100.0 * usedCount / DiskConst.DISK_SIZE);
-            System.out.println("Storage usage: " + usagePercentage + "%");
-            System.out.println("Allocated blocks: " + usedCount);
-            System.out.println("Available blocks: " + (DiskConst.DISK_SIZE - usedCount));
+            System.out.println("存储使用率: " + usagePercentage + "%");
+            System.out.println("已分配块数: " + usedCount);
+            System.out.println("可用块数: " + (DiskConst.DISK_SIZE - usedCount));
         }
     }
 
@@ -88,7 +88,7 @@ public class VirtualDisk implements Serializable {
     public boolean isFull() {
         storageExhausted = true;
         for (int i = 0; i < DiskConst.DISK_SIZE; i++) {
-            if (!storageBlocks[i].isUSED()) {
+            if (!storageBlocks[i].isUsed()) {
                 storageExhausted = false;
                 break;
             }

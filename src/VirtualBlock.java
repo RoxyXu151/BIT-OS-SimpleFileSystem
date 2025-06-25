@@ -6,7 +6,7 @@ import java.io.Serializable;
  */
 public class VirtualBlock implements Serializable {
     // 存储块的最大容量（字符数）
-    private final static int maxCapacity = DiskConst.BLOCK_SIZE;    
+    private static final int MAX_CAPACITY = DiskConst.BLOCK_SIZE;    
     // 存储块的唯一标识符
     private final int blockIndex;                                   
     // 存储块的剩余可用空间
@@ -22,7 +22,7 @@ public class VirtualBlock implements Serializable {
      */
     public VirtualBlock(int blockIndex) {
         this.blockIndex = blockIndex;
-        this.availableSpace = maxCapacity;
+        this.availableSpace = MAX_CAPACITY ;
         this.allocated = false;
         this.data = "";
     }
@@ -32,7 +32,7 @@ public class VirtualBlock implements Serializable {
      * @return 存储块容量（字符数）
      */
     public int getBlockSize() {
-        return maxCapacity;
+        return MAX_CAPACITY;
     }
 
     /**
@@ -47,7 +47,7 @@ public class VirtualBlock implements Serializable {
      * 检查存储块是否已被分配使用
      * @return 如果已分配则返回true，否则返回false
      */
-    public boolean isUSED() {
+    public boolean isUsed() {
         return allocated;
     }
 
@@ -55,7 +55,7 @@ public class VirtualBlock implements Serializable {
      * 设置存储块的分配状态
      * @param status 分配状态，true表示已分配，false表示未分配
      */
-    public void setUSED(boolean status) {
+    public void setUsed(boolean status) {
         allocated = status;
     }
 
@@ -73,7 +73,7 @@ public class VirtualBlock implements Serializable {
      */
     public void writeBlock(String newData) {
         this.data = newData;
-        this.availableSpace = maxCapacity - newData.length();
+        this.availableSpace = MAX_CAPACITY - newData.length();
         this.allocated = true;
     }
 
@@ -82,7 +82,7 @@ public class VirtualBlock implements Serializable {
      */
     public void clearBlock() {
         this.data = "";
-        this.availableSpace = maxCapacity;
+        this.availableSpace = MAX_CAPACITY;
         this.allocated = false;
     }
 

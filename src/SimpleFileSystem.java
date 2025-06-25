@@ -29,9 +29,9 @@ public class SimpleFileSystem {
         this.commandScanner = new Scanner(System.in);
         
         // 检查是否存在持久化的文件系统数据
-        File persistenceFile = new File(DiskConst.SerializePath);
+        File persistenceFile = new File(DiskConst.SERIALIZE_PATH);
         if (persistenceFile.exists()) {
-            restoreFileSystem(DiskConst.SerializePath);
+            restoreFileSystem(DiskConst.SERIALIZE_PATH);
             workingDirectory = rootDirectory;
         }
     }
@@ -77,16 +77,16 @@ public class SimpleFileSystem {
     public void mkdir(String directoryName) {
         // 验证目录名是否合法
         if (directoryName.equals(".") || directoryName.equals("..") || directoryName.contains("/")) {
-            // 文件名不能为"."或者".."，并且不能包含"/"
-            System.out.println("Failed: Invalid directory name!");
-            System.out.println("Directory name should not be \".\" or contains \"/\".");
-        } else if (workingDirectory.dirTable.containsKey(directoryName)) {
+            // 文件名不能为"."或者"..",并且不能包含"/"
+            System.out.println("错误：无效的目录名！");
+            System.out.println("目录名不能为\".\"或\"..\",且不能包含\"/\"");
+        } else if (workingDirectory.containsEntry(directoryName)) {
             // 检查同名文件夹或者文件是否已经存在
-            System.out.println("Failed: " + directoryName + " is already existed.");
+            System.out.println("错误：目录 '" + directoryName + "' 已存在");
         } else {
             // 当以上条件均正确无误时将目录项添加至 dirTable 中
-            workingDirectory.dirTable.put(directoryName, new Directory(directoryName, true, workingDirectory));
-            System.out.println(directoryName + " is created.");
+            workingDirectory.addEntry(directoryName, new Directory(directoryName, true, workingDirectory));
+            System.out.println("目录 '" + directoryName + "' 已创建");
         }
     }
 
@@ -100,11 +100,11 @@ public class SimpleFileSystem {
         Directory stashCurrDir = workingDirectory;
         String stashCurrentPath = workingPath;
         // 目录名称存在并且类型为目录
-        if (workingDirectory.dirTable.containsKey(directoryName) && workingDirectory.dirTable.get(directoryName).isDirectory) {
-            Directory tmpDir = (Directory) workingDirectory.dirTable.get(directoryName);
-            if (tmpDir.dirTable.isEmpty()) {
+        if (workingDirectory.containsEntry(directoryName) && workingDirectory.getEntry(directoryName).isDirectory) {
+            Directory tmpDir = (Directory) workingDirectory.getEntry(directoryName);
+            if (tmpDir.isEmpty()) {
                 // 当文件目录为空时，可以删除当前目录
-                workingDirectory.dirTable.remove(directoryName);
+                workingDirectory.removeEntry(directoryName);
                 System.out.println(directoryName + " is removed.");
             } else {
                 // 当文件夹不为空时，询问是否要递归删除全部内容
@@ -115,9 +115,9 @@ public class SimpleFileSystem {
                 String answer = commandScanner.next();
                 if (answer.equals("Y") || answer.equals("y")) {
                     // 确认清理
-                    cd("./" + directoryName);
-                    for (String fName : workingDirectory.dirTable.keySet()) {
-                        if (workingDirectory.dirTable.get(fName).isDirectory) {
+                    cd("." + "/" + directoryName);
+                    for (String fName : workingDirectory.getEntryNames()) {
+                        if (workingDirectory.getEntry(fName).isDirectory) {
                             // 递归删除文件夹
                             r_rmdir(fName);
                         } else {
@@ -126,7 +126,7 @@ public class SimpleFileSystem {
                         }
                     }
                     cd("./..");
-                    workingDirectory.dirTable.remove(directoryName);
+                    workingDirectory.removeEntry(directoryName);
                     System.out.println(directoryName + " is removed.");
                 } else {
                     // 不清理
@@ -151,17 +151,17 @@ public class SimpleFileSystem {
         Directory stashCurrDir = workingDirectory;
         String stashCurrentPath = workingPath;
         // 目录名称存在并且类型为目录
-        if (workingDirectory.dirTable.containsKey(directoryName) && workingDirectory.dirTable.get(directoryName).isDirectory) {
-            Directory tmpDir = (Directory) workingDirectory.dirTable.get(directoryName);
-            if (tmpDir.dirTable.isEmpty()) {
+        if (workingDirectory.containsEntry(directoryName) && workingDirectory.getEntry(directoryName).isDirectory) {
+            Directory tmpDir = (Directory) workingDirectory.getEntry(directoryName);
+            if (tmpDir.isEmpty()) {
                 // 当文件目录为空时，可以删除当前目录
-                workingDirectory.dirTable.remove(directoryName);
+                workingDirectory.removeEntry(directoryName);
                 System.out.println(directoryName + " is removed.");
             } else {
                 // 递归清理
-                cd("./" + directoryName);
-                for (String fName : workingDirectory.dirTable.keySet()) {
-                    if (workingDirectory.dirTable.get(fName).isDirectory) {
+                cd("." + "/" + directoryName);
+                for (String fName : workingDirectory.getEntryNames()) {
+                    if (workingDirectory.getEntry(fName).isDirectory) {
                         // 递归删除文件夹
                         r_rmdir(fName);
                     } else {
@@ -170,7 +170,7 @@ public class SimpleFileSystem {
                     }
                 }
                 cd("./..");
-                workingDirectory.dirTable.remove(directoryName);
+                workingDirectory.removeEntry(directoryName);
                 System.out.println(directoryName + " is removed.");
             }
         } else {
@@ -187,8 +187,8 @@ public class SimpleFileSystem {
     public void ls() {
         pwd();
         // 目录为紫色；文件为浅蓝色。
-        for (String name : workingDirectory.dirTable.keySet()) {
-            if (workingDirectory.dirTable.get(name).isDirectory) {
+        for (String name : workingDirectory.getEntryNames()) {
+            if (workingDirectory.getEntry(name).isDirectory) {
                 System.out.println("\033[35;4m" + name + "\033[0m");
             } else {
                 System.out.println("\033[36;4m" + name + "\033[0m");
@@ -241,14 +241,14 @@ public class SimpleFileSystem {
                 for (int i = 1; i < directories.length; i++) {
                     dirName = directories[i];
                     // 文件目录项存在且类型为目录，这里利用了短路运算
-                    if (tmpCurrDir.dirTable.containsKey(dirName) && tmpCurrDir.dirTable.get(dirName).isDirectory) {
+                    if (tmpCurrDir.containsEntry(dirName) && tmpCurrDir.getEntry(dirName).isDirectory) {
                         // 访问下一层
-                        tmpCurrDir = (Directory) tmpCurrDir.dirTable.get(dirName);
+                        tmpCurrDir = (Directory) tmpCurrDir.getEntry(dirName);
                         tmpPath.append(dirName).append("/");
-                    } else if (dirName.equals("..") && tmpCurrDir.parentDir != null) {
+                    } else if (dirName.equals("..") && tmpCurrDir.getParentDir() != null) {
                         // 访问上一层
-                        tmpCurrDir = tmpCurrDir.parentDir;
-                        tmpPath = new StringBuilder(tmpPath.substring(0, tmpPath.length() - workingDirectory.name.length() - 1));
+                        tmpCurrDir = tmpCurrDir.getParentDir();
+                        tmpPath = new StringBuilder(tmpPath.substring(0, tmpPath.length() - workingDirectory.getName().length() - 1));
                     } else {
                         // 错误处理
                         parseFinished = false;
@@ -273,16 +273,16 @@ public class SimpleFileSystem {
      */
     private void createFile(String fileName) {
         if (fileName.equals(".") || fileName.equals("..") || fileName.contains("/")) {
-            // 文件名不能为"."或者".."，并且不能包含"/"
+            // 文件名不能为"."或者"..",并且不能包含"/"
             System.out.println("Failed: Invalid directory name!");
             System.out.println("Directory name should not be \".\" or contains \"/\".");
-        } else if (workingDirectory.dirTable.containsKey(fileName)) {
+        } else if (workingDirectory.containsEntry(fileName)) {
             // 检查同名文件夹或者文件是否已经存在
             System.out.println("Failed: " + fileName + " is already existed.");
         } else {
             // 当以上条件均正确无误时将目录项添加至 dirTable 中
             // 使用Lazy分配策略，创建文件时不分配空间，文件写入时分配空间，这里仅需要添加目录项目即可。
-            workingDirectory.dirTable.put(fileName, new DirectoryFile(fileName, false, workingDirectory));
+            workingDirectory.addEntry(fileName, new DirectoryFile(fileName, false, workingDirectory));
             System.out.println(fileName + " is created.");
         }
     }
@@ -296,21 +296,21 @@ public class SimpleFileSystem {
             // 文件名不能为"."或者"..",并且不能包含"/"
             System.out.println("错误：无效的文件名！");
             System.out.println("文件名不能为\".\"或\"..\",且不能包含\"/\"");
-        } else if (!workingDirectory.dirTable.containsKey(fileName)) {
+        } else if (!workingDirectory.containsEntry(fileName)) {
             // 检查文件是否存在
             System.out.println("错误：文件 '" + fileName + "' 不存在");
-        } else if (workingDirectory.dirTable.get(fileName).isDirectory) {
+        } else if (workingDirectory.getEntry(fileName).isDirectory) {
             // 检查是否为文件
             System.out.println("错误：'" + fileName + "' 是目录而非文件");
         } else {
-            // 当以上条件均正确无误时将目录项从 dirTable 中移除
-            DirectoryFile fileEntry = (DirectoryFile) workingDirectory.dirTable.get(fileName);
+            // 当以上条件均正确无误时从 dirTable 中移除
+            DirectoryFile fileEntry = (DirectoryFile) workingDirectory.getEntry(fileName);
             if (fileEntry.isOpened()) {
                 System.out.println("错误：文件 '" + fileName + "' 已打开，请先关闭");
             } else {
                 // 释放文件占用的存储空间并从目录表中移除
                 fileEntry.file.fileClear(storageDevice);
-                workingDirectory.dirTable.remove(fileName);
+                workingDirectory.removeEntry(fileName);
                 System.out.println("文件 '" + fileName + "' 已删除");
             }
         }
@@ -325,15 +325,15 @@ public class SimpleFileSystem {
             // 文件名不能为"."或者"..",并且不能包含"/"
             System.out.println("错误：无效的文件名！");
             System.out.println("文件名不能为\".\"或\"..\",且不能包含\"/\"");
-        } else if (!workingDirectory.dirTable.containsKey(fileName)) {
+        } else if (!workingDirectory.containsEntry(fileName)) {
             // 检查文件是否存在
             System.out.println("错误：文件 '" + fileName + "' 不存在");
-        } else if (workingDirectory.dirTable.get(fileName).isDirectory) {
+        } else if (workingDirectory.getEntry(fileName).isDirectory) {
             // 检查是否为文件
             System.out.println("错误：'" + fileName + "' 是目录而非文件");
         } else {
             // 打开文件
-            DirectoryFile fileEntry = (DirectoryFile) workingDirectory.dirTable.get(fileName);
+            DirectoryFile fileEntry = (DirectoryFile) workingDirectory.getEntry(fileName);
             if (fileEntry.isOpened()) {
                 System.out.println("错误：文件 '" + fileName + "' 已经处于打开状态");
             } else {
@@ -354,15 +354,15 @@ public class SimpleFileSystem {
             // 文件名不能为"."或者"..",并且不能包含"/"
             System.out.println("错误：无效的文件名！");
             System.out.println("文件名不能为\".\"或\"..\",且不能包含\"/\"");
-        } else if (!workingDirectory.dirTable.containsKey(fileName)) {
+        } else if (!workingDirectory.containsEntry(fileName)) {
             // 检查文件是否存在
             System.out.println("错误：文件 '" + fileName + "' 不存在");
-        } else if (workingDirectory.dirTable.get(fileName).isDirectory) {
+        } else if (workingDirectory.getEntry(fileName).isDirectory) {
             // 检查是否为文件
             System.out.println("错误：'" + fileName + "' 是目录而非文件");
         } else {
             // 关闭文件
-            DirectoryFile fileEntry = (DirectoryFile) workingDirectory.dirTable.get(fileName);
+            DirectoryFile fileEntry = (DirectoryFile) workingDirectory.getEntry(fileName);
             if (!fileEntry.isOpened()) {
                 System.out.println("错误：文件 '" + fileName + "' 未打开");
             } else {
@@ -381,10 +381,10 @@ public class SimpleFileSystem {
      */
     private String readFile(String fileName) {
         String buffer = null;
-        if (workingDirectory.dirTable.containsKey(fileName) && !workingDirectory.dirTable.get(fileName).isDirectory) {
+        if (workingDirectory.containsEntry(fileName) && !workingDirectory.getEntry(fileName).isDirectory) {
             // 文件存在时
             System.out.println("Loading...");
-            DirectoryFile tmpFile = (DirectoryFile) workingDirectory.dirTable.get(fileName);
+            DirectoryFile tmpFile = (DirectoryFile) workingDirectory.getEntry(fileName);
             // 当文件打开时
             if (tmpFile.file.isOpen()) {
                 buffer = tmpFile.file.getContent();
@@ -404,10 +404,10 @@ public class SimpleFileSystem {
      * @param mode 写入模式 ("a"追加, "w"覆盖)
      */
     private void writeFile(String fileName, String buf, String mode) {
-        if (workingDirectory.dirTable.containsKey(fileName) && !workingDirectory.dirTable.get(fileName).isDirectory) {
+        if (workingDirectory.containsEntry(fileName) && !workingDirectory.getEntry(fileName).isDirectory) {
             // 文件存在时
             System.out.println("Loading...");
-            DirectoryFile tmpFile = (DirectoryFile) workingDirectory.dirTable.get(fileName);
+            DirectoryFile tmpFile = (DirectoryFile) workingDirectory.getEntry(fileName);
             // 当文件打开时
             if (tmpFile.file.isOpen() && (mode.equals("a") || mode.equals("w"))) {
                 tmpFile.file.setContent(buf, mode);
@@ -437,7 +437,7 @@ public class SimpleFileSystem {
                 case "exit":
                     // 退出文件系统
                     System.out.println("Exiting the VirtualFile System.");
-                    persistFileSystem(DiskConst.SerializePath);
+                    persistFileSystem(DiskConst.SERIALIZE_PATH);
                     break label;
                 case "mkdir":
                     // 创建目录

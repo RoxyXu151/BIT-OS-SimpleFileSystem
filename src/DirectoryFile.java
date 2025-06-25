@@ -42,14 +42,8 @@ public class DirectoryFile extends DirectoryEntry implements Serializable {
      * @param status 目标状态，true表示打开，false表示关闭
      */
     public void setOpen(boolean status) {
-        // 创建一个新的反射字段访问器来设置private字段
-        try {
-            java.lang.reflect.Field field = VirtualFile.class.getDeclaredField("openStatus");
-            field.setAccessible(true);
-            field.set(file, status);
-        } catch (Exception e) {
-            System.out.println("错误：无法设置文件状态 - " + e.getMessage());
-        }
+        // 使用VirtualFile提供的方法设置状态
+        file.setOpenStatus(status);
     }
 
     @Override

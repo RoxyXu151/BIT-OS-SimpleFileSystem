@@ -33,6 +33,16 @@ public class VirtualFile implements Serializable {
     public boolean isOpen() {
         return openStatus;
     }
+    
+    /**
+     * 设置文件的打开状态（仅用于标记，不涉及实际的内容加载/保存）
+     * 注意：此方法仅用于简化实现，完整操作应使用setOpen(boolean, VirtualDisk)
+     * 
+     * @param status 目标状态，true表示打开，false表示关闭
+     */
+    public void setOpenStatus(boolean status) {
+        this.openStatus = status;
+    }
 
     /**
      * 打开或关闭文件
@@ -113,7 +123,7 @@ public class VirtualFile implements Serializable {
             storage.diskFree(blocksToFree);
             success = true;
         } else {
-            System.out.println("Failed: File is currently open. Please close it before deletion.");
+            System.out.println("错误：文件当前处于打开状态，请在删除前关闭文件。");
         }
         return success;
     }
