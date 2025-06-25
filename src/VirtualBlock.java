@@ -1,78 +1,98 @@
 import java.io.Serializable;
 
+/**
+ * 存储块类
+ * 表示存储系统中的基本存储单元，使用字符串存储内容以简化实现
+ */
 public class VirtualBlock implements Serializable {
+    // 存储块的最大容量（字符数）
+    private final static int maxCapacity = DiskConst.BLOCK_SIZE;    
+    // 存储块的唯一标识符
+    private final int blockIndex;                                   
+    // 存储块的剩余可用空间
+    private int availableSpace;                                     
+    // 存储块的使用状态标志
+    private boolean allocated;                                      
+    // 存储块中的实际内容
+    private String data;                                            
+
     /**
-     * 虚拟块类：
-     *      用来标识磁盘和内存中的基本存储单位，模拟按字节编址（基本单元为字节），
-     *      实际采用按照字符编址的方法，并以字符串对象代替字符数组，以简化操作流程。
-     * 属性：
-     *      块号：虚拟块的唯一标识。一旦创建则不可修改。
-     *      块容量：虚拟块的容量大小。虚拟块容量默认设置为 100，代表一个虚拟块可以存储 100 个字符，即字符串长度不能超过 100。
-     *      块空闲容量：虚拟块的空闲容量。当虚拟块未满时，记录虚拟块的剩余空间。
-     *      块空闲标志：虚拟块的空闲标志。当虚拟块未满时，该标记未真，否则为假。在这里为了简化操作，该标志表示虚拟块是否被使用，
-     *                若已被使用则未真，否则为假。
-     *      块内容：虚拟块的内容。用于记录虚拟块的真实内容，这里使用字符串代替字符数组，以简化流程。
-     * 方法：
-     *      构造方法
-     *      变量的 Get 方法和 Set 方法
-     * 补充：
-     *      若想将虚拟块模拟的更为细致，首先可以将内容变量的变量类型改为固定大小的字符数组，并调用字符串和字符数组的相互转换函数。
-     *      但是在各个组件的数据传输中，仍然建议使用字符串进行传递，方便且高效。其次，可以设置 ArrayList<Integer> Position
-     *      用来记录不同文件的分割之处的位置，并针对此添加 append 附加函数和 remove 删除函数，还需要对别的细节进行实现，这样
-     *      就可以避免外部碎片的产生，提高存储占用率。
-     * */
-    private final static int blockSize = DiskConst.BLOCK_SIZE;      // 块容量
-    private final int blockID;                                      // 块号
-    private int freeSize;                                           // 块空闲容量
-    private boolean isUSED;                                         // 块是否被占用
-    private String content;                                         // 块内容
-
-    public VirtualBlock(int blockID) {
-        this.blockID = blockID;
-        this.freeSize = blockSize;
-        this.isUSED = false;
-        this.content = "";
+     * 构造一个新的存储块
+     * @param blockIndex 存储块的唯一标识符
+     */
+    public VirtualBlock(int blockIndex) {
+        this.blockIndex = blockIndex;
+        this.availableSpace = maxCapacity;
+        this.allocated = false;
+        this.data = "";
     }
 
+    /**
+     * 获取存储块的最大容量
+     * @return 存储块容量（字符数）
+     */
     public int getBlockSize() {
-        return blockSize;
+        return maxCapacity;
     }
 
+    /**
+     * 获取存储块的唯一标识符
+     * @return 存储块标识符
+     */
     public int getBlockID() {
-        return blockID;
+        return blockIndex;
     }
 
+    /**
+     * 检查存储块是否已被分配使用
+     * @return 如果已分配则返回true，否则返回false
+     */
     public boolean isUSED() {
-        return isUSED;
+        return allocated;
     }
 
-    public void setUSED(boolean USED) {
-        isUSED = USED;
+    /**
+     * 设置存储块的分配状态
+     * @param status 分配状态，true表示已分配，false表示未分配
+     */
+    public void setUSED(boolean status) {
+        allocated = status;
     }
 
+    /**
+     * 读取存储块中的内容
+     * @return 存储块中的数据字符串
+     */
     public String readBlock() {
-        return content;
+        return data;
     }
 
-    public void writeBlock(String content) {
-        this.content = content;
-        this.freeSize = blockSize - content.length();
-        this.isUSED = true;
+    /**
+     * 向存储块写入内容
+     * @param newData 要写入的数据字符串
+     */
+    public void writeBlock(String newData) {
+        this.data = newData;
+        this.availableSpace = maxCapacity - newData.length();
+        this.allocated = true;
     }
 
+    /**
+     * 清空存储块内容并重置状态
+     */
     public void clearBlock() {
-        this.content = "";
-        this.freeSize = blockSize;
-        this.isUSED = false;
+        this.data = "";
+        this.availableSpace = maxCapacity;
+        this.allocated = false;
     }
 
     @Override
     public String toString() {
         return "VirtualBlock{" +
-                "blockID=" + blockID +
-                ", freeSize=" + freeSize +
-                ", isUSED=" + isUSED +
-                ", content='" + content + '\'' +
+                "blockIndex=" + blockIndex +
+                ", availableSpace=" + availableSpace +
+                ", allocated=" + allocated +
+                ", data='" + data + '\'' +
                 '}';
     }
 }

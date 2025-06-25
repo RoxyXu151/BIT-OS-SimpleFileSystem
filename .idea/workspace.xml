@@ -44,10 +44,11 @@
     "project.structure.proportion": "0.0",
     "project.structure.side.proportion": "0.2",
     "settings.editor.selected.configurable": "preferences.lookFeel",
-    "vue.rearranger.settings.migration": "true"
+    "vue.rearranger.settings.migration": "true",
+    "应用程序.Main.executor": "Run"
   }
 }]]></component>
-  <component name="RunManager" selected="JAR 应用程序.SimpleFileSystem.jar">
+  <component name="RunManager" selected="应用程序.Main">
     <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="Main" />
       <module name="SimpleFileSystem" />
@@ -61,8 +62,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JAR 应用程序.SimpleFileSystem.jar" />
         <item itemvalue="应用程序.Main" />
+        <item itemvalue="JAR 应用程序.SimpleFileSystem.jar" />
       </list>
     </recent_temporary>
   </component>

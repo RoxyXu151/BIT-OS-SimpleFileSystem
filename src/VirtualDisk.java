@@ -2,78 +2,107 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * 存储设备类
+ * 模拟物理存储设备，管理存储块的分配和释放
+ */
 public class VirtualDisk implements Serializable {
-    public String diskName;                 // 虚拟磁盘名
-    public VirtualBlock[] diskBlocks;       // 虚拟块表
-    public int[] blockUsage;                // 虚拟块占用表
-    private boolean isFull;                 // 磁盘是否已满
+    // 存储设备标识符
+    public String deviceId;                 
+    // 存储块数组
+    public VirtualBlock[] storageBlocks;    
+    // 存储块分配状态表 (0=空闲, 1=已分配)
+    public int[] allocationMap;             
+    // 存储设备空间状态
+    private boolean storageExhausted;       
 
-    public VirtualDisk(String diskName) {
-        this.diskName = diskName;
-        this.diskBlocks = new VirtualBlock[DiskConst.DISK_SIZE];
-        this.blockUsage = new int[DiskConst.DISK_SIZE];
-        this.isFull = false;
-        // 初始化块
+    /**
+     * 创建新的存储设备实例
+     * @param deviceId 存储设备标识符
+     */
+    public VirtualDisk(String deviceId) {
+        this.deviceId = deviceId;
+        this.storageBlocks = new VirtualBlock[DiskConst.DISK_SIZE];
+        this.allocationMap = new int[DiskConst.DISK_SIZE];
+        this.storageExhausted = false;
+        
+        // 初始化所有存储块
         for (int i = 0; i < DiskConst.DISK_SIZE; i++) {
-            this.diskBlocks[i] = new VirtualBlock(i);
-            this.blockUsage[i] = 0;
+            this.storageBlocks[i] = new VirtualBlock(i);
+            this.allocationMap[i] = 0;
         }
     }
 
-    public ArrayList<Integer> diskAlloc(int num) {
-        ArrayList<Integer> idxBuffer = new ArrayList<>();
-        for (int i = 0; i < num; i++) {
+    /**
+     * 分配指定数量的存储块
+     * @param blockCount 需要分配的存储块数量
+     * @return 分配的存储块索引列表
+     */
+    public ArrayList<Integer> diskAlloc(int blockCount) {
+        ArrayList<Integer> allocatedBlocks = new ArrayList<>();
+        for (int i = 0; i < blockCount; i++) {
             for (int j = 0; j < DiskConst.DISK_SIZE; j++) {
-                if (blockUsage[j] == 0) {
-                    idxBuffer.add(j);
-                    blockUsage[j] = 1;
+                if (allocationMap[j] == 0) {
+                    allocatedBlocks.add(j);
+                    allocationMap[j] = 1;
                     break;
                 }
             }
         }
-        return idxBuffer;
+        return allocatedBlocks;
     }
 
-    public void diskFree(ArrayList<Integer> idxBuffer) {
-        for (Integer idx : idxBuffer) {
-            diskBlocks[idx].clearBlock();
-            blockUsage[idx] = 0;
+    /**
+     * 释放指定的存储块
+     * @param blockIndices 要释放的存储块索引列表
+     */
+    public void diskFree(ArrayList<Integer> blockIndices) {
+        for (Integer index : blockIndices) {
+            storageBlocks[index].clearBlock();
+            allocationMap[index] = 0;
         }
     }
 
+    /**
+     * 显示存储设备使用情况
+     */
     public void diskUsage() {
         if (isFull()) {
-            System.out.println("Disk is used up.");
+            System.out.println("Storage device is completely full.");
         } else {
-            int used = 0;
+            int usedCount = 0;
             for (int i = 0; i < DiskConst.DISK_SIZE; i++) {
-                used += blockUsage[i];
+                usedCount += allocationMap[i];
             }
-            int usageRate = (int) (100.0 * used / DiskConst.DISK_SIZE);
-            System.out.println("Disk Usage: " + usageRate + "%");
-            System.out.println("Used blocks: " + used);
-            System.out.println("Free blocks: " + (DiskConst.DISK_SIZE - used));
+            int usagePercentage = (int) (100.0 * usedCount / DiskConst.DISK_SIZE);
+            System.out.println("Storage usage: " + usagePercentage + "%");
+            System.out.println("Allocated blocks: " + usedCount);
+            System.out.println("Available blocks: " + (DiskConst.DISK_SIZE - usedCount));
         }
     }
 
+    /**
+     * 检查存储设备是否已满
+     * @return 如果存储设备已满则返回true，否则返回false
+     */
     public boolean isFull() {
-        isFull = true;
+        storageExhausted = true;
         for (int i = 0; i < DiskConst.DISK_SIZE; i++) {
-            if (!diskBlocks[i].isUSED()) {
-                isFull = false;
+            if (!storageBlocks[i].isUSED()) {
+                storageExhausted = false;
                 break;
             }
         }
-        return isFull;
+        return storageExhausted;
     }
 
     @Override
     public String toString() {
         return "VirtualDisk{" +
-                "diskName='" + diskName + '\'' +
-                ", diskBlocks=" + Arrays.toString(diskBlocks) +
-                ", blockUsage=" + Arrays.toString(blockUsage) +
-                ", isFull=" + isFull +
+                "deviceId='" + deviceId + '\'' +
+                ", storageBlocks=" + Arrays.toString(storageBlocks) +
+                ", allocationMap=" + Arrays.toString(allocationMap) +
+                ", storageExhausted=" + storageExhausted +
                 '}';
     }
 }
